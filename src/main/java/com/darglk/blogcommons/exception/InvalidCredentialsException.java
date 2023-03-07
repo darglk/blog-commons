@@ -1,6 +1,7 @@
 package com.darglk.blogcommons.exception;
 
 import com.darglk.blogcommons.model.LoginRequest;
+
 import jakarta.validation.ConstraintViolation;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
