@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         UsernamePasswordAuthenticationToken authentication;
         response.setContentType("application/json");
-        log.info("LOGGING KURWA");
+        System.out.println("KURWWAAAAAAAA");
         try {
             authentication = getAuthentication(request);
         } catch (CustomException error) {
@@ -104,6 +104,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());
+                System.err.println(e.getMessage());
                 throw new NotAuthorizedException();
             }
         }
