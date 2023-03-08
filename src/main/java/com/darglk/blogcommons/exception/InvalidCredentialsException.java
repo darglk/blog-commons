@@ -2,11 +2,11 @@ package com.darglk.blogcommons.exception;
 
 import com.darglk.blogcommons.model.LoginRequest;
 
-import jakarta.validation.ConstraintViolation;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 
+import javax.validation.ConstraintViolation;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
