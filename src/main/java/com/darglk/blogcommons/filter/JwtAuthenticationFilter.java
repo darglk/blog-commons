@@ -3,6 +3,7 @@ package com.darglk.blogcommons.filter;
 import com.darglk.blogcommons.exception.CustomException;
 import com.darglk.blogcommons.exception.ErrorResponse;
 import com.darglk.blogcommons.exception.NotAuthorizedException;
+import com.darglk.blogcommons.model.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -53,7 +54,6 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         UsernamePasswordAuthenticationToken authentication;
         response.setContentType("application/json");
-        System.out.println("KURWWAAAAAAAA");
         try {
             authentication = getAuthentication(request);
         } catch (CustomException error) {
@@ -86,9 +86,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                         .parseClaimsJws(token.replace("Bearer ", Strings.EMPTY));
 
                 String userId = parsedToken.getBody().getSubject();
-                var sessions = realmResource.users().get(userId);
+                var user = realmResource.users().get(userId);
                 var sessionId = parsedToken.getBody().get("sid").toString();
-                var session = sessions.getUserSessions()
+                var session = user.getUserSessions()
                         .stream()
                         .filter(s -> s.getId().equals(sessionId))
                         .findAny();
@@ -96,15 +96,19 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                     throw new NotAuthorizedException();
                 }
                 var userResponse = authUserService.getUser(userId);
+                if (!userResponse.getEnabled()) {
+                    throw new NotAuthorizedException();
+                }
+
                 var authorities = userResponse.getAuthorities()
                         .stream()
-                        .map(a -> new SimpleGrantedAuthority(a.getName())).collect(Collectors.toList());
-                if (!userId.isEmpty()) {
-                    return new UsernamePasswordAuthenticationToken(userResponse, null, authorities);
-                }
+                        .map(a -> new SimpleGrantedAuthority(a.getName()))
+                        .collect(Collectors.toList());
+
+                final var principal = new UserPrincipal(userId, userResponse.getEmail());
+                return new UsernamePasswordAuthenticationToken(principal, null, authorities);
             } catch (Exception e) {
                 log.error(e.getMessage());
-                System.err.println(e.getMessage());
                 throw new NotAuthorizedException();
             }
         }
