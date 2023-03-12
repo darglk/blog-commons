@@ -97,7 +97,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                         .map(a -> new SimpleGrantedAuthority(a.getName()))
                         .collect(Collectors.toList());
 
-                final var principal = new UserPrincipal(userId, userResponse.getEmail());
+                final var principal = new UserPrincipal(userId, userResponse.getEmail(), sessionId);
                 return new UsernamePasswordAuthenticationToken(principal, null, authorities);
             } catch (Exception e) {
                 log.error(e.getMessage());
