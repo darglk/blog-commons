@@ -1,6 +1,7 @@
 package com.darglk.blogcommons.filter;
 
 import com.darglk.blogcommons.exception.NotAuthorizedException;
+import com.darglk.blogcommons.model.UserPrincipal;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,7 +39,8 @@ public class MockAuthenticationFilter extends BasicAuthenticationFilter {
             var userId = tokenContents[0];
             var authorities = Arrays.stream(tokenContents[1].split(","))
                     .map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-            return new UsernamePasswordAuthenticationToken(userId, userId, authorities);
+            var principal = new UserPrincipal(userId, token, token);
+            return new UsernamePasswordAuthenticationToken(principal, userId, authorities);
         }
         throw new NotAuthorizedException();
     }
