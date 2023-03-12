@@ -4,6 +4,7 @@ import com.darglk.blogcommons.exception.CustomException;
 import com.darglk.blogcommons.exception.ErrorResponse;
 import com.darglk.blogcommons.exception.NotAuthorizedException;
 import com.darglk.blogcommons.model.UserPrincipal;
+import com.darglk.blogcommons.utils.JwtParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -75,16 +76,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             try {
-                byte[] byteKey = Base64.decode(jwtKey.getBytes());
-                X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
-                KeyFactory kf = KeyFactory.getInstance("RSA");
-
-                var key = kf.generatePublic(X509publicKey);
-                Jws<Claims> parsedToken = Jwts.parserBuilder()
-                        .setSigningKey(key)
-                        .build()
-                        .parseClaimsJws(token.replace("Bearer ", Strings.EMPTY));
-
+                var parsedToken = JwtParser.parseToken(token, jwtKey);
                 String userId = parsedToken.getBody().getSubject();
                 var user = realmResource.users().get(userId);
                 var sessionId = parsedToken.getBody().get("sid").toString();
