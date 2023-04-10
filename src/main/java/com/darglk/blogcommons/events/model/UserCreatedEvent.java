@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserCreatedEvent {
     private String userId;
     private String email;
+    private String activationToken;
 }
